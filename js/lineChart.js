@@ -152,11 +152,12 @@ LineChart.prototype.updateVis = function(){
 
     // Update our line path
     vis.g.select(".line")
+        .attr("stroke", color(vis.coin))
         .transition(vis.t)
         .attr("d", line(vis.dataTimeFiltered));
 
     // Update y-axis label
     var newText = (vis.yValue == "price_usd") ? "Price (USD)" :
-        ((yValue == "market_cap") ?  "Market Capitalization (USD)" : "24 Hour Trading Volume (USD)")
+        ((vis.yValue == "market_cap") ?  "Market Capitalization (USD)" : "24 Hour Trading Volume (USD)")
     vis.yLabel.text(newText);
 };

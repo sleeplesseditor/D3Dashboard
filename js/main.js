@@ -1,12 +1,17 @@
-var lineChart;
-
+var lineChart, 
+    donutChart1, 
+    dountChart2;
+var filteredData = {};
+var donutData = [];
 var parseTime = d3.timeParse("%d/%m/%Y");
 var formatTime = d3.timeFormat("%d/%m/%Y");
 var bisectDate = d3.bisector(function(d) { return d.date; }).left;
-
+var color = d3.scaleOrdinal(d3.schemeDark2);
 
 // Event listeners
-$("#coin-select").on("change", function(){ lineChart.wrangleData(); })
+$("#coin-select").on("change", function() { 
+    coinChanged();
+})
 $("#var-select").on("change", function(){ lineChart.wrangleData(); })
 
 // Add jQuery UI slider
@@ -22,6 +27,17 @@ $("#date-slider").slider({
         lineChart.wrangleData();
     }
 });
+
+function arcClicked(arc){
+    $("#coin-select").val(arc.data.coin);
+    coinChanged();
+}
+
+function coinChanged(){
+    donutChart1.wrangleData();
+    donutChart2.wrangleData();
+    lineChart.wrangleData();
+}
 
 d3.json("data/coins.json").then(function(data){
 // console.log(data);
@@ -41,8 +57,16 @@ d3.json("data/coins.json").then(function(data){
             d["market_cap"] = +d["market_cap"];
             d["date"] = parseTime(d["date"])
         });
+        donutData.push({
+            "coin":coin,
+            "data": filteredData[coin].slice(-1)[0]
+        })
     }
 
-    lineChart = new LineChart("#chart-area");
+    console.log(donutData);
 
+    lineChart = new LineChart("#line-area");
+
+    donutChart1 = new DonutChart("#donut-area1", "24h_vol");
+    dountChart2 = new DonutChart("#donut-area2", "market_cap");
 })
