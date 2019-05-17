@@ -6,8 +6,8 @@ LineChart = function (_parentElement, _coin){
 LineChart.prototype.initVis = function(){
     var vis = this;
 
-    vis.margin = { left:80, right:100, top:50, bottom:100 };
-    vis.height = 450 - vis.margin.top - vis.margin.bottom;
+    vis.margin = { left:80, right:100, top:30, bottom:30 };
+    vis.height = 350 - vis.margin.top - vis.margin.bottom;
     vis.width = 800 - vis.margin.left - vis.margin.right;
 
     vis.svg = d3.select(vis.parentElement)
