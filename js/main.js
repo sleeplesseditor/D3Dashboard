@@ -1,6 +1,7 @@
 var lineChart, 
     donutChart1, 
-    dountChart2;
+    dountChart2, 
+    timeline;
 var filteredData = {};
 var donutData = [];
 var parseTime = d3.timeParse("%d/%m/%Y");
@@ -13,6 +14,7 @@ $("#coin-select").on("change", function() {
 })
 $("#var-select").on("change", function(){ 
     lineChart.wrangleData(); 
+    timeline.wrangleData();
 })
 
 // Add jQuery UI slider
@@ -23,9 +25,11 @@ $("#date-slider").slider({
     step: 86400000, // One day
     values: [parseTime("12/5/2013").getTime(), parseTime("31/10/2017").getTime()],
     slide: function(event, ui){
-        $("#dateLabel1").text(formatTime(new Date(ui.values[0])));
-        $("#dateLabel2").text(formatTime(new Date(ui.values[1])));
-        lineChart.wrangleData();
+        dates = ui.values.map(function(val) { return new Date(val); })
+        xVals = dates.map(function(date) { return timeline.x(date); })
+
+        timeline.brushComponent
+            .call(timeline.brush.move, xVals)
     }
 });
 
@@ -37,6 +41,19 @@ function arcClicked(arc){
 function coinChanged(){
     donutChart1.wrangleData();
     donutChart2.wrangleData();
+    lineChart.wrangleData();
+    timeline.wrangleData();
+}
+
+function brushed() {
+    var selection = d3.event.selection || timeline.x.range();
+    var newValues = selection.map(timeline.x.invert)
+
+    $("#date-slider")
+        .slider('values', 0, newValues[0])
+        .slider('values', 1, newValues[1]);
+    $("#dateLabel1").text(formatTime(newValues[0]));
+    $("#dateLabel2").text(formatTime(newValues[1]));
     lineChart.wrangleData();
 }
 
@@ -69,4 +86,6 @@ d3.json("data/coins.json").then(function(data){
 
     donutChart1 = new DonutChart("#donut-area1", "24h_vol");
     donutChart2 = new DonutChart("#donut-area2", "market_cap");
+
+    timeline = new Timeline("#timeline-area");
 })
